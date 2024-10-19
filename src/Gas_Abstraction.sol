@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "forge-std/console.sol";
 
 contract GasAbstraction is Ownable (msg.sender) {
     uint256 public gasThreshold;  // Dynamic threshold for small vs large transactions
@@ -54,9 +55,14 @@ contract GasAbstraction is Ownable (msg.sender) {
     }
 
     // Withdraw funds (owner only)
-    function withdrawFunds(uint256 amount) external onlyOwner {
-        require(amount <= liquidityPool, "Not enough liquidity");
-        liquidityPool -= amount;
-        payable(owner()).transfer(amount);
-    }
+function withdrawFunds(uint256 amount) external onlyOwner {
+    console.log("Withdraw called with amount:", amount);
+    console.log("Current liquidity pool:", liquidityPool);
+    console.log("Contract balance:", address(this).balance);
+    require(amount <= liquidityPool, "Not enough liquidity");
+    liquidityPool -= amount;
+    (bool success, ) = payable(owner()).call{value: amount}("");
+    require(success, "Transfer failed");
+    console.log("Transfer completed");
+}
 }
