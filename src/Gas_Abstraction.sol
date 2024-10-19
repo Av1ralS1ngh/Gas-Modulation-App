@@ -4,16 +4,16 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "forge-std/console.sol";
 
-contract GasAbstraction is Ownable (msg.sender) {
-    uint256 public gasThreshold;  // Dynamic threshold for small vs large transactions
-    uint256 public liquidityPool;  // Contract's liquidity pool
+contract GasAbstraction is Ownable(msg.sender) {
+    uint256 public gasThreshold; // Dynamic threshold for small vs large transactions
+    uint256 public liquidityPool; // Contract's liquidity pool
 
     // Event to track gas payments
     event GasPaid(address indexed user, uint256 gasUsed, bool isSmallTx);
 
     constructor() {
-        liquidityPool = 1 ether;  // Start with some liquidity
-        gasThreshold = 0.1 ether;  // Initial threshold (can be dynamically updated)
+        liquidityPool = 1 ether; // Start with some liquidity
+        gasThreshold = 0.1 ether; // Initial threshold (can be dynamically updated)
     }
 
     // Modifier to check if the contract has enough liquidity
@@ -28,19 +28,19 @@ contract GasAbstraction is Ownable (msg.sender) {
         uint256 gasUsed = tx.gasprice * gasleft(); // Calculate gas used
         require(liquidityPool >= gasUsed, "Insufficient liquidity");
 
-        liquidityPool -= gasUsed;  // Deduct gas from liquidity pool
+        liquidityPool -= gasUsed; // Deduct gas from liquidity pool
         emit GasPaid(msg.sender, gasUsed, true);
     }
 
     // Charge extra gas for large transactions
     function chargeExtraGasForLargeTx() external payable {
         require(msg.value > gasThreshold, "Transaction is below gas threshold");
-        
+
         uint256 gasUsed = tx.gasprice * gasleft(); // Calculate gas used
-        uint256 extraGas = gasUsed * 2;  // Charge extra
+        uint256 extraGas = gasUsed * 2; // Charge extra
         require(msg.value >= extraGas, "Insufficient gas for large transaction");
 
-        liquidityPool += extraGas - gasUsed;  // Replenish pool
+        liquidityPool += extraGas - gasUsed; // Replenish pool
         emit GasPaid(msg.sender, extraGas, false);
     }
 
@@ -55,14 +55,14 @@ contract GasAbstraction is Ownable (msg.sender) {
     }
 
     // Withdraw funds (owner only)
-function withdrawFunds(uint256 amount) external onlyOwner {
-    console.log("Withdraw called with amount:", amount);
-    console.log("Current liquidity pool:", liquidityPool);
-    console.log("Contract balance:", address(this).balance);
-    require(amount <= liquidityPool, "Not enough liquidity");
-    liquidityPool -= amount;
-    (bool success, ) = payable(owner()).call{value: amount}("");
-    require(success, "Transfer failed");
-    console.log("Transfer completed");
-}
+    function withdrawFunds(uint256 amount) external onlyOwner {
+        console.log("Withdraw called with amount:", amount);
+        console.log("Current liquidity pool:", liquidityPool);
+        console.log("Contract balance:", address(this).balance);
+        require(amount <= liquidityPool, "Not enough liquidity");
+        liquidityPool -= amount;
+        (bool success,) = payable(owner()).call{value: amount}("");
+        require(success, "Transfer failed");
+        console.log("Transfer completed");
+    }
 }

@@ -19,10 +19,10 @@ contract GasAbstractionTest is Test {
     function testDepositLiquidity() public {
         vm.deal(owner, 2 ether);
         vm.startPrank(owner);
-        
+
         gasAbstraction.depositLiquidity{value: 1 ether}();
-        
-        assertEq(gasAbstraction.liquidityPool(), 2 ether);  // Updated expectation
+
+        assertEq(gasAbstraction.liquidityPool(), 2 ether); // Updated expectation
         vm.stopPrank();
     }
 
@@ -33,9 +33,9 @@ contract GasAbstractionTest is Test {
         vm.startPrank(user);
 
         gasAbstraction.payGasForSmallTx{value: 0.05 ether}();
-        
+
         uint256 gasUsed = tx.gasprice * gasleft();
-        assertEq(gasAbstraction.liquidityPool(), 2 ether - gasUsed);  // Updated expectation
+        assertEq(gasAbstraction.liquidityPool(), 2 ether - gasUsed); // Updated expectation
         vm.stopPrank();
     }
 
@@ -49,8 +49,8 @@ contract GasAbstractionTest is Test {
 
         uint256 gasUsed = tx.gasprice * gasleft();
         uint256 extraGas = gasUsed * 2;
-        uint256 expectedLiquidity = 2 ether + (extraGas - gasUsed);  // Updated calculation
-        
+        uint256 expectedLiquidity = 2 ether + (extraGas - gasUsed); // Updated calculation
+
         assertEq(gasAbstraction.liquidityPool(), expectedLiquidity);
         vm.stopPrank();
     }
@@ -62,40 +62,41 @@ contract GasAbstractionTest is Test {
         vm.stopPrank();
     }
 
-function testWithdrawFunds() public {
-    // Check initial state
-    console.log("Initial liquidity pool:", gasAbstraction.liquidityPool());
-    console.log("Initial owner balance:", owner.balance);
+    function testWithdrawFunds() public {
+        // Check initial state
+        console.log("Initial liquidity pool:", gasAbstraction.liquidityPool());
+        console.log("Initial owner balance:", owner.balance);
 
-    // Deposit liquidity
-    vm.deal(owner, 1 ether);
-    vm.prank(owner);
-    gasAbstraction.depositLiquidity{value: 1 ether}();
-    
-    console.log("Liquidity pool after deposit:", gasAbstraction.liquidityPool());
-    console.log("Owner balance after deposit:", owner.balance);
+        // Deposit liquidity
+        vm.deal(owner, 1 ether);
+        vm.prank(owner);
+        gasAbstraction.depositLiquidity{value: 1 ether}();
 
-    uint256 initialOwnerBalance = owner.balance;
-    
-    // Attempt withdrawal
-    vm.prank(owner);
-    gasAbstraction.withdrawFunds(0.5 ether);
+        console.log("Liquidity pool after deposit:", gasAbstraction.liquidityPool());
+        console.log("Owner balance after deposit:", owner.balance);
 
-    console.log("Liquidity pool after withdrawal:", gasAbstraction.liquidityPool());
-    console.log("Owner balance after withdrawal:", owner.balance);
+        uint256 initialOwnerBalance = owner.balance;
 
-    // Assertions
-    assertEq(gasAbstraction.liquidityPool(), 1.5 ether);  // Assuming 1 ether initial + 1 ether deposit - 0.5 ether withdrawal
-    assertEq(owner.balance, initialOwnerBalance + 0.5 ether);
-}
+        // Attempt withdrawal
+        vm.prank(owner);
+        gasAbstraction.withdrawFunds(0.5 ether);
+
+        console.log("Liquidity pool after withdrawal:", gasAbstraction.liquidityPool());
+        console.log("Owner balance after withdrawal:", owner.balance);
+
+        // Assertions
+        assertEq(gasAbstraction.liquidityPool(), 1.5 ether); // Assuming 1 ether initial + 1 ether deposit - 0.5 ether withdrawal
+        assertEq(owner.balance, initialOwnerBalance + 0.5 ether);
+    }
+
     function testWithdrawFailWithoutEnoughLiquidity() public {
-    vm.startPrank(owner);
-    
-    // The contract already has 1 ether from the constructor
-    // Let's try to withdraw more than that without depositing more
-    vm.expectRevert("Not enough liquidity");
-    gasAbstraction.withdrawFunds(1.1 ether);
-    
-    vm.stopPrank();
-}
+        vm.startPrank(owner);
+
+        // The contract already has 1 ether from the constructor
+        // Let's try to withdraw more than that without depositing more
+        vm.expectRevert("Not enough liquidity");
+        gasAbstraction.withdrawFunds(1.1 ether);
+
+        vm.stopPrank();
+    }
 }
