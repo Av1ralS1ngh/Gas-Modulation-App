@@ -16,6 +16,7 @@ contract GasAbstraction is Ownable(msg.sender) {
         gasThreshold = 0.1 ether; // Initial threshold (can be dynamically updated)
     }
 
+    uint256 threshold = thresholdContract.getThreshold();
     // Modifier to check if the contract has enough liquidity
     modifier hasLiquidity() {
         require(liquidityPool > 0, "No liquidity available");
@@ -23,26 +24,37 @@ contract GasAbstraction is Ownable(msg.sender) {
     }
 
     // Pay gas for small transactions
-    function payGasForSmallTx() external payable hasLiquidity {
-        require(msg.value <= gasThreshold, "Transaction exceeds gas threshold");
+    function payGasForSmallTx(address payable to, uint256 amount) external payable hasLiquidity {
+        require(msg.value <= threshold, "Transaction exceeds gas threshold");
         uint256 gasUsed = tx.gasprice * gasleft(); // Calculate gas used
         require(liquidityPool >= gasUsed, "Insufficient liquidity");
 
         liquidityPool -= gasUsed; // Deduct gas from liquidity pool
         emit GasPaid(msg.sender, gasUsed, true);
+        payable(msg.sender).transfer(gasRefund);
+        to.transfer(amount);
     }
 
     // Charge extra gas for large transactions
-    function chargeExtraGasForLargeTx() external payable {
-        require(msg.value > gasThreshold, "Transaction is below gas threshold");
+    function chargeExtraGasForLargeTx(address payable to, uint256 amount) external payable {
+    require(msg.value > threshold, "Transaction is below gas threshold");
+    
+    uint256 fee = (msg.value * 1) / 100; // 1% fee
+    uint256 netAmount = msg.value - fee;
+    
+    uint256 gasUsed = tx.gasprice * gasleft(); // Calculate gas used
+    uint256 amountReceived = gasUsed + netAmount; // Charge extra
+    
+    liquidityPool += amountReceived; // Replenish pool
+    
+    emit GasPaid(msg.sender, amountReceived, false);
+    
+    // Transfer net amount to recipient
+    to.transfer(amount);
+    payable(address(this)).transfer(netAmount);
+}
 
-        uint256 gasUsed = tx.gasprice * gasleft(); // Calculate gas used
-        uint256 extraGas = gasUsed * 2; // Charge extra
-        require(msg.value >= extraGas, "Insufficient gas for large transaction");
-
-        liquidityPool += extraGas - gasUsed; // Replenish pool
-        emit GasPaid(msg.sender, extraGas, false);
-    }
+    
 
     // Allow external service to update the gas threshold
     function updateThreshold(uint256 newThreshold) external onlyOwner {
@@ -65,4 +77,6 @@ contract GasAbstraction is Ownable(msg.sender) {
         require(success, "Transfer failed");
         console.log("Transfer completed");
     }
+    receive() external payable {}
 }
+

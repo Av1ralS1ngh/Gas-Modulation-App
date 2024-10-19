@@ -1,7 +1,11 @@
 import React, { useState, useContext } from "react";
 import { ethers } from "ethers";
 import { WalletContext } from "../context/WalletContext";
-import { getContract } from "../utils/contractConfig";
+
+const contractAddress = "YOUR_LIQUIDITY_POOL_CONTRACT_ADDRESS";
+const abi = [
+  // ABI details for LiquidityPool contract
+];
 
 const TransactionForm = () => {
   const [amount, setAmount] = useState("");
@@ -10,7 +14,7 @@ const TransactionForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const contract = getContract("LiquidityPool", signer);
+    const contract = new ethers.Contract(contractAddress, abi, signer);
     const txValue = ethers.utils.parseEther(amount);
     const transaction = await contract.transact(toAddress, txValue, { value: txValue });
     await transaction.wait();
