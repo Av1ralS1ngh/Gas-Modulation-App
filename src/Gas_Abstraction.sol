@@ -3,12 +3,12 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract GasAbstraction is Ownable {
+contract GasAbstraction is Ownable (msg.sender) {
     uint256 public gasThreshold;  // Dynamic threshold for small vs large transactions
     uint256 public liquidityPool;  // Contract's liquidity pool
 
     // Event to track gas payments
-    event GasPaid(address indexed user, uint256 gasUsed);
+    event GasPaid(address indexed user, uint256 gasUsed, bool isSmallTx);
 
     constructor() {
         liquidityPool = 1 ether;  // Start with some liquidity
@@ -22,23 +22,25 @@ contract GasAbstraction is Ownable {
     }
 
     // Pay gas for small transactions
-    function payGasForSmallTx(address user) external hasLiquidity {
-        uint256 gasUsed = tx.gasprice * gasleft();
-        if (msg.value <= gasThreshold) {
-            require(liquidityPool >= gasUsed, "Insufficient liquidity");
-            liquidityPool -= gasUsed;  // Deduct gas from liquidity pool
-            emit GasPaid(user, gasUsed);
-        }
+    function payGasForSmallTx() external payable hasLiquidity {
+        require(msg.value <= gasThreshold, "Transaction exceeds gas threshold");
+        uint256 gasUsed = tx.gasprice * gasleft(); // Calculate gas used
+        require(liquidityPool >= gasUsed, "Insufficient liquidity");
+
+        liquidityPool -= gasUsed;  // Deduct gas from liquidity pool
+        emit GasPaid(msg.sender, gasUsed, true);
     }
 
     // Charge extra gas for large transactions
-    function chargeExtraGasForLargeTx(address user) external payable {
-        if (msg.value > gasThreshold) {
-            uint256 extraGas = tx.gasprice * gasleft() * 2;  // Charge extra
-            require(msg.value >= extraGas, "Insufficient gas for large transaction");
-            liquidityPool += extraGas - tx.gasprice * gasleft();  // Replenish pool
-            emit GasPaid(user, extraGas);
-        }
+    function chargeExtraGasForLargeTx() external payable {
+        require(msg.value > gasThreshold, "Transaction is below gas threshold");
+        
+        uint256 gasUsed = tx.gasprice * gasleft(); // Calculate gas used
+        uint256 extraGas = gasUsed * 2;  // Charge extra
+        require(msg.value >= extraGas, "Insufficient gas for large transaction");
+
+        liquidityPool += extraGas - gasUsed;  // Replenish pool
+        emit GasPaid(msg.sender, extraGas, false);
     }
 
     // Allow external service to update the gas threshold
