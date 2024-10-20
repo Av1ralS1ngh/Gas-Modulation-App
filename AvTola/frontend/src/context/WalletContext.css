@@ -1,0 +1,14 @@
+.wallet-status {
+    font-size: 1.2rem;
+    color: #ff8a00;
+    margin-top: 20px;
+  }
+  
+  .wallet-status p {
+    animation: walletPopUp 0.5s ease-in-out;
+  }
+  
+  @keyframes walletPopUp {
+    0% { transform: translateY(-20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }

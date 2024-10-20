@@ -1,0 +1,21 @@
+button {
+    background-color: #1a73e8;
+    color: white;
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #135cb8;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  p {
+    color: #4caf50;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }

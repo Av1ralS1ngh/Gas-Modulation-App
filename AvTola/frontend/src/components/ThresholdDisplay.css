@@ -1,0 +1,13 @@
+.threshold-display {
+    background-color: #333333;
+    color: #ff8a00;
+    padding: 1rem;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    margin-top: 20px;
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  .threshold-display:hover {
+    opacity: 0.8;
+  }

@@ -1,4 +1,5 @@
 import React from 'react';
+import './App.css';   
 import TransactionForm from './components/TransactionForm';
 import ThresholdDisplay from './components/ThresholdDisplay';
 import { WalletProvider } from './context/WalletContext';

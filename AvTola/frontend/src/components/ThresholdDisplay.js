@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
+import './ThresholdDisplay.css';
 
 const contractAddress = "YOUR_DYNAMIC_THRESHOLD_CONTRACT_ADDRESS";
 const abi = [

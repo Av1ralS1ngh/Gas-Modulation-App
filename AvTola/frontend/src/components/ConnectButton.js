@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { WalletContext } from "../context/WalletContext";
+import './ConnectButton.css';
 
 const ConnectButton = () => {
   const { connectWallet, connected } = useContext(WalletContext);

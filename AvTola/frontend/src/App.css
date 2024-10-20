@@ -1,0 +1,20 @@
+.App {
+    text-align: center;
+    background: linear-gradient(135deg, #f6f8fa 0%, #eaeef1 100%);
+    min-height: 100vh;
+    font-family: 'Roboto', sans-serif;
+    padding: 20px;
+  }
+  
+  h1 {
+    color: #ff8a00; /* MetaMask orange */
+    font-size: 3rem;
+    margin-bottom: 2rem;
+    text-shadow: 2px 2px #e3e3e3;
+    animation: bounce 2s infinite alternate;
+  }
+  
+  @keyframes bounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-10px); }
+  }
