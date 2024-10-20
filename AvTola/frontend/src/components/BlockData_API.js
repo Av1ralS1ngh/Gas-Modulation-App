@@ -1,17 +1,32 @@
 const axios = require('axios');
 const EventEmitter = require('events');
+const { Server } = require('socket.io');
+const http = require('http');
+
+// Set up a basic HTTP server for Socket.IO
+const server = http.createServer();
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000", // Frontend URL
+    methods: ["GET", "POST"]
+  }
+});
+
 const ALCHEMY_URL = 'https://eth-sepolia.g.alchemy.com/v2/qwKU_mQH3ujxhGMcOtdUkkBUOUIvlyk-';
-let THRESHOLD = 0.000000000000002; // Initial threshold in ETH
+let THRESHOLD = 0.00000000000002; // Initial threshold in ETH
 class PercentageEmitter extends EventEmitter {}
 const percentageEmitter = new PercentageEmitter();
 
 function adjustThreshold(percentage) {
-  if (percentage < 75) {
-    THRESHOLD *= 1.05; // Increase threshold by 5%
+  if (percentage < 65) {
+    THRESHOLD *= 1.02; // Increase threshold by 5%
   } else {
-    THRESHOLD *= 0.95; // Decrease threshold by 5%
+    THRESHOLD *= 0.98; // Decrease threshold by 5%
   }
   console.log(`New threshold: ${THRESHOLD} ETH`);
+
+  // Emit the new threshold value to the frontend
+  io.emit('thresholdUpdate', THRESHOLD); // This emits to all connected clients
 }
 
 async function getTransactionsPercentageBelowThreshold() {
@@ -43,16 +58,21 @@ async function getTransactionsPercentageBelowThreshold() {
     
     // Adjust the threshold based on the percentage
     adjustThreshold(parseFloat(percentageBelowThreshold));
-    
-    // Emit the new percentage
+
+    // Emit the percentage update event
     percentageEmitter.emit('update', percentageBelowThreshold);
   } catch (error) {
     console.error('Error:', error);
   }
 }
 
-// Run every second
+// Run the block fetching every second
 setInterval(getTransactionsPercentageBelowThreshold, 1000);
 
-// Export the emitter so it can be used in other files
+// Start the Socket.IO server
+server.listen(4000, () => {
+  console.log('Socket.IO server running on http://localhost:4000');
+});
+
+// Export the emitter for other modules if needed
 module.exports = percentageEmitter;

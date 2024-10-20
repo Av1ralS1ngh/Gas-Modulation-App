@@ -18,6 +18,18 @@ const TransactionForm = () => {
 
     try {
       const txValue = ethers.utils.parseEther(amount); // Convert the entered amount to wei
+      const oneLakhWei = ethers.utils.parseUnits("100000", "wei"); // 100,000 wei
+
+      // Check if the amount is more or less than 100,000 wei
+      if (txValue.gte(oneLakhWei)) {
+        // Show alert for amounts greater than or equal to 100,000 wei
+        const proceed = window.confirm("Your amount won't be refunded.");
+        if (!proceed) return; // If the user cancels the alert, do not proceed
+      } else {
+        // Show alert for amounts less than 100,000 wei
+        const proceed = window.confirm("Your amount will be refunded.");
+        if (!proceed) return; // If the user cancels the alert, do not proceed
+      }
 
       // Create a transaction object
       const transaction = {
