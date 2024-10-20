@@ -11,8 +11,22 @@ contract GasAbstraction is Ownable(msg.sender) {
     uint256 public liquidityPool; // Contract's liquidity pool
 
     constructor(address _thresholdAddress) {
+        console.log("GasAbstraction constructor called with address:", _thresholdAddress);
+        require(_thresholdAddress != address(0), "Threshold address is zero");
         thresholdContract = DynamicThreshold(_thresholdAddress);
+        console.log("thresholdContract set to:", address(thresholdContract));
+        
+        // Attempt to call getThreshold and log the result
+        try thresholdContract.getThreshold() returns (uint256 threshold) {
+            console.log("Initial threshold:", threshold);
+        } catch Error(string memory reason) {
+            console.log("Error calling getThreshold:", reason);
+        } catch (bytes memory) {
+            console.log("Unknown error calling getThreshold");
+        }
+        
         liquidityPool = 1 ether;
+        console.log("liquidityPool set to:", liquidityPool);
     }
     // Event to track gas payments
 event GasPaid(address indexed user, uint256 gasUsed, bool isSmallTx);
