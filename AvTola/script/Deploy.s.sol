@@ -12,14 +12,15 @@ contract Deploy is Script {
         DynamicThreshold threshold = new DynamicThreshold();
         GasAbstraction pool = new GasAbstraction(address(threshold));
 
+        vm.stopBroadcast();
         // Store deployed contract addresses in a JSON file
         string memory jsonOutput = string(abi.encodePacked(
-            '{ "LiquidityPool": "', vm.toString(address(pool)), '", ',
+            '{ "LiquidityPool": "', vm.toString(address(pool)), '", '
             '"DynamicThreshold": "', vm.toString(address(threshold)), '" }'
         ));
 
         vm.writeJson(jsonOutput, "./frontend/src/deployedContracts.json");
 
-        vm.stopBroadcast();
+        
     }
 }
