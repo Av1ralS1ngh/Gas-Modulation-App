@@ -10,7 +10,7 @@ contract Deploy is Script {
         vm.startBroadcast();
 
         DynamicThreshold threshold = new DynamicThreshold();
-        LiquidityPool pool = new LiquidityPool(address(threshold));
+        GasAbstraction pool = new GasAbstraction(address(threshold));
 
         // Store deployed contract addresses in a JSON file
         string memory jsonOutput = string(abi.encodePacked(

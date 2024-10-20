@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "./Ownable.sol";
 import "forge-std/console.sol";
 import "./DynamicThreshold.sol";
-
-
     
 contract GasAbstraction is Ownable(msg.sender) {
     DynamicThreshold public thresholdContract;
@@ -14,9 +12,10 @@ contract GasAbstraction is Ownable(msg.sender) {
 
     constructor(address _thresholdAddress) {
         thresholdContract = DynamicThreshold(_thresholdAddress);
-        owner = msg.sender;
         liquidityPool = 1 ether;
     }
+    // Event to track gas payments
+event GasPaid(address indexed user, uint256 gasUsed, bool isSmallTx);
 
      uint256 threshold = thresholdContract.getThreshold();
     // Modifier to check if the contract has enough liquidity
