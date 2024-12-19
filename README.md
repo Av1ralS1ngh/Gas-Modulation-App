@@ -1,66 +1,47 @@
-## Foundry
+# Gas Abstraction Project
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+A blockchain-based solution for the newbies in the blockchain world, leveraging ERC-4337 Account Abstraction to provide dynamic gas fee management. This project was developed during the Syntax Error Hackathon and focuses on a unique mechanism to subsidize small transactions and charge higher fees for larger ones to maintain a local liquidity pool.
 
-Foundry consists of:
+## Features
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+- **Dynamic Gas Fee Management**: 
+  - Small transactions are subsidized using a local liquidity pool.
+  - High-value transactions rejuvenate the liquidity pool by charging additional fees.
+- **ERC-4337 Account Abstraction**: Utilized for enabling contract-based accounts.
+- **Dynamic Threshold Adjustment**: 
+  - Transaction thresholds are dynamically set using real-time data from the blockchain.
+  - Threshold data is fetched using QuickNode API and integrated seamlessly.
+- **Secure and Efficient**: 
+  - Gas abstraction ensures optimal user experience with reduced gas burden.
+  - The mechanism supports fairness and prevents abuse of subsidies.
 
-## Documentation
+## Tech Stack
 
-https://book.getfoundry.sh/
+- **Frontend**: 
+  - React for a seamless user interface.
+  - JavaScript for dynamic interactions.
+- **Backend**: 
+  - Solidity smart contracts for transaction handling.
+  - Foundry framework for contract development and testing.
+- **Blockchain**:
+  - Deployed on Sepolia Testnet for testing purposes.
+  - Data fetching and analysis using Alchemy Sepolia API.
 
-## Usage
+## Smart Contracts
 
-### Build
+1. **LiquidityPool.sol**: Manages the local liquidity pool, including deposits and withdrawals.
+2. **DynamicThreshold.sol**: Adjusts transaction thresholds dynamically based on blockchain data.
 
-```shell
-$ forge build
-```
+## Project Workflow
 
-### Test
+1. **Dynamic Threshold Adjustment**:
+   - Fetch the latest transaction data using Alchemy Sepolia API.
+   - Calculate the threshold based on transaction patterns.
 
-```shell
-$ forge test
-```
+2. **Transaction Handling**:
+   - For small transactions: Fees are covered using the liquidity pool.
+   - For large transactions: Higher fees are charged to replenish the pool.
 
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+3. **Frontend Interaction**:
+   - Users interact with the interface to initiate transactions.
+   - The 'Transact' button triggers the latest threshold calculation and sends it to the contract.
