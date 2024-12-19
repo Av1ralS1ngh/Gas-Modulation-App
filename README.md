@@ -1,4 +1,4 @@
-# Gas Abstraction Project
+# Gas-Modulation-App
 
 A blockchain-based solution for the newbies in the blockchain world, leveraging ERC-4337 Account Abstraction to provide dynamic gas fee management. This project was developed during the Syntax Error Hackathon and focuses on a unique mechanism to subsidize small transactions and charge higher fees for larger ones to maintain a local liquidity pool.
 
